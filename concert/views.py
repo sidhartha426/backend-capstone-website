@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
@@ -10,6 +11,12 @@ from concert.forms import LoginForm, SignUpForm
 from concert.models import Concert, ConcertAttending
 import requests as req
 
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+songs_url = os.environ.get('SONGS_URL')
+photo_url = os.environ.get('PHOTO_URL')
 
 # Create your views here.
 
@@ -36,19 +43,12 @@ def index(request):
 
 
 def songs(request):
-    songs = {"songs":[{"id":1,"title":"duis faucibus accumsan odio curabitur convallis","lyrics":"Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis."}]}
+    songs = req.get(songs_url).json()
     return render(request, "songs.html", {"songs":songs["songs"]})
 
 
 def photos(request):
-    photos = [{
-    "id": 1,
-    "pic_url": "http://dummyimage.com/136x100.png/5fa2dd/ffffff",
-    "event_country": "United States",
-    "event_state": "District of Columbia",
-    "event_city": "Washington",
-    "event_date": "11/16/2022"
-    }]
+    photos = req.get(photo_url).json()
     return render(request, "photos.html", {"photos": photos})
 
 def login_view(request):
